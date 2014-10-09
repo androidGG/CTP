@@ -277,22 +277,22 @@ void CTraderApi::RunInThread()
 			_ASSERT(FALSE);
 			break;
 		}
-
+		m_nSleep = 1;
 		if (0 == iRet)
 		{
 			//返回成功，填加到已发送池
-			m_nSleep = 1;
+			
 			AddRequestMapBuf(lRequest,pRequest);
 
 			lock_guard<mutex> cl(m_csList);
 			m_reqList.pop_front();
 		}
-		else
-		{
+		//else
+		//{
 			//失败，按4的幂进行延时，但不超过1s
-			m_nSleep *= 4;
-			m_nSleep %= 1023;
-		}
+		//	m_nSleep *= 4;
+		//	m_nSleep %= 1023;
+		//}
 		Sleep(m_nSleep);
 	}
 
