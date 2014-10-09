@@ -67,6 +67,7 @@ typedef void(__stdcall *fnOnRtnInstrumentStatus)(void* pTraderApi, CThostFtdcIns
 typedef void(__stdcall *fnOnRtnOrder)(void* pTraderApi, CThostFtdcOrderField *pOrder);
 typedef void(__stdcall *fnOnRtnQuote)(void* pTraderApi, CThostFtdcQuoteField *pQuote);
 typedef void(__stdcall *fnOnRtnTrade)(void* pTraderApi, CThostFtdcTradeField *pTrade);
+typedef void(__stdcall *fnOnProduct)(void* pTraderApi,CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo);
 
 
 //创建接收消息队列，支持响应行情和交易
@@ -100,6 +101,7 @@ QUANTBOXC2CTP_API void __stdcall CTP_RegOnRtnInstrumentStatus(void* pMsgQueue, f
 QUANTBOXC2CTP_API void __stdcall CTP_RegOnRtnOrder(void* pMsgQueue, fnOnRtnOrder pCallback);
 QUANTBOXC2CTP_API void __stdcall CTP_RegOnRtnQuote(void* pMsgQueue, fnOnRtnQuote pCallback);
 QUANTBOXC2CTP_API void __stdcall CTP_RegOnRtnTrade(void* pMsgQueue, fnOnRtnTrade pCallback);
+QUANTBOXC2CTP_API void __stdcall CTP_RegOnProduct(void* pMsgQueue, fnOnProduct pCallback);
 
 //释放消息队列
 QUANTBOXC2CTP_API void __stdcall CTP_ReleaseMsgQueue(void* pMsgQueue);
@@ -216,6 +218,8 @@ QUANTBOXC2CTP_API void __stdcall TD_ReqQryInstrumentMarginRate(void* pTraderApi,
 QUANTBOXC2CTP_API void __stdcall TD_ReqQryDepthMarketData(void* pTraderApi, const char* szInstrumentId);
 //请求查询投资者结算结果
 QUANTBOXC2CTP_API void __stdcall TD_ReqQrySettlementInfo(void* pTraderApi, const char* szTradingDay);
+//查询产品信息
+QUANTBOXC2CTP_API void __stdcall TD_ReqQryProductInfo(void* pTraderApi, const char* type);
 
 #ifdef __cplusplus
 }

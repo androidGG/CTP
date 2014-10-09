@@ -35,6 +35,7 @@ class CCTPMsgQueue
 		E_fnOnRtnOrder,
 		E_fnOnRtnQuote,
 		E_fnOnRtnTrade,
+		E_funOnProduct,
 	};
 
 	struct SMsgItem
@@ -68,6 +69,7 @@ class CCTPMsgQueue
 			CThostFtdcSettlementInfoField			SettlementInfo;
 			CThostFtdcTradingAccountField			TradingAccount;
 			CThostFtdcQuoteField					Quote;
+			CThostFtdcProductField					product;
 		};
 	};
 
@@ -155,6 +157,7 @@ public:
 	void RegisterCallback(fnOnRtnOrder pCallback){ m_fnOnRtnOrder = pCallback; }
 	void RegisterCallback(fnOnRtnQuote pCallback){ m_fnOnRtnQuote = pCallback; }
 	void RegisterCallback(fnOnRtnTrade pCallback){ m_fnOnRtnTrade = pCallback; }
+	void RegisterCallback(fnOnProduct pCallback){ m_fnOnProduct = pCallback; }
 
 	//响应结果处理后入队列(按字母排序)
 	void Input_OnConnect(void* pApi,CThostFtdcRspUserLoginField *pRspUserLogin,ConnectionStatus result);
@@ -184,7 +187,7 @@ public:
 	void Input_OnRtnOrder(void* pTraderApi,CThostFtdcOrderField *pOrder);
 	void Input_OnRtnQuote(void* pTraderApi, CThostFtdcQuoteField *pQuote);
 	void Input_OnRtnTrade(void* pTraderApi,CThostFtdcTradeField *pTrade);
-	
+	void Input_OnRspQryProductInfo(void* pTraderApi, CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 private:
 	friend DWORD WINAPI ProcessThread(LPVOID lpParam);
 	void RunInThread();
@@ -332,6 +335,11 @@ private:
 		if (m_fnOnRspQrySettlementInfo)
 			(*m_fnOnRspQrySettlementInfo)(pItem->pApi, &pItem->SettlementInfo, &pItem->RspInfo, pItem->nRequestID, pItem->bIsLast);
 	}
+	void Output_OnRtnProduct(SMsgItem* pItem)
+	{
+		if(m_fnOnProduct)
+			(*m_fnOnProduct)(pItem->pApi,&pItem->product,&pItem->RspInfo);
+	}
 
 private:
 	volatile bool				m_bRunning;
@@ -369,5 +377,6 @@ private:
 	fnOnRtnOrder						m_fnOnRtnOrder;
 	fnOnRtnQuote						m_fnOnRtnQuote;
 	fnOnRtnTrade						m_fnOnRtnTrade;
+	fnOnProduct							m_fnOnProduct;
 };
 

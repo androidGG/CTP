@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "CTPMsgQueue.h"
-
+#include <iostream>
 void CCTPMsgQueue::Clear()
 {
 	SMsgItem* pItem = NULL;
@@ -89,12 +89,14 @@ void CCTPMsgQueue::_Input_MD(SMsgItem* pMsgItem)
 {
 	m_queue_MD.enqueue(pMsgItem);
 	SetEvent(m_hEvent);
+	//_Output_MD(pMsgItem);
 }
 
 void CCTPMsgQueue::_Input_TD(SMsgItem* pMsgItem)
 {
 	m_queue_TD.enqueue(pMsgItem);
 	SetEvent(m_hEvent);
+	//_Output_TD(pMsgItem);
 }
 
 void CCTPMsgQueue::_Output_MD(SMsgItem* pMsgItem)
@@ -189,6 +191,9 @@ void CCTPMsgQueue::_Output_TD(SMsgItem* pMsgItem)
 		break;
 	case E_fnOnRtnTrade:
 		Output_OnRtnTrade(pMsgItem);
+		break;
+	case E_funOnProduct:
+		Output_OnRtnProduct(pMsgItem);
 		break;
 	default:
 		_ASSERT(false);
@@ -755,6 +760,28 @@ void CCTPMsgQueue::Input_OnRspQrySettlementInfo(void* pTraderApi, CThostFtdcSett
 		pItem->bIsLast = bIsLast;
 		if (pSettlementInfo)
 			pItem->SettlementInfo = *pSettlementInfo;
+		if (pRspInfo)
+			pItem->RspInfo = *pRspInfo;
+
+		_Input_TD(pItem);
+	}
+}
+void CCTPMsgQueue::Input_OnRspQryProductInfo(void* pTraderApi, CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	if (NULL == pProduct
+		&&NULL == pRspInfo)
+		return;
+
+	SMsgItem* pItem = new SMsgItem;
+	if (pItem)
+	{
+		memset(pItem, 0, sizeof(SMsgItem));
+		pItem->type = E_funOnProduct;
+		pItem->pApi = pTraderApi;
+		pItem->nRequestID = nRequestID;
+		pItem->bIsLast = bIsLast;
+		if (pProduct)
+			pItem->product = *pProduct;
 		if (pRspInfo)
 			pItem->RspInfo = *pRspInfo;
 

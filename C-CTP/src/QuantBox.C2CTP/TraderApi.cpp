@@ -2,7 +2,7 @@
 #include "TraderApi.h"
 #include "CTPMsgQueue.h"
 #include "include\toolkit.h"
-
+#include <iostream>
 CTraderApi::CTraderApi(void)
 {
 	m_pApi = NULL;
@@ -273,6 +273,8 @@ void CTraderApi::RunInThread()
 		case E_QrySettlementInfoField:
 			iRet = m_pApi->ReqQrySettlementInfo(&pRequest->QrySettlementInfoField, lRequest);
 			break;
+		case E_qryProductInfoField:
+			iRet = m_pApi->ReqQryProduct(&pRequest->productField,lRequest);
 		default:
 			_ASSERT(FALSE);
 			break;
@@ -289,7 +291,7 @@ void CTraderApi::RunInThread()
 		}
 		//else
 		//{
-			//失败，按4的幂进行延时，但不超过1s
+		//	//失败，按4的幂进行延时，但不超过1s
 		//	m_nSleep *= 4;
 		//	m_nSleep %= 1023;
 		//}
@@ -1007,4 +1009,22 @@ void CTraderApi::ReqQrySettlementInfo(const string& szTradingDay)
 	strncpy(body.TradingDay, szTradingDay.c_str(), sizeof(TThostFtdcDateType));
 
 	AddToSendQueue(pRequest);
+}
+void CTraderApi::TD_ReqQryProduct(const string& type){
+	if (NULL == m_pApi)
+		return;
+	SRequest* pRequest = MakeRequestBuf(E_qryProductInfoField);
+	if (NULL == pRequest)
+		return;
+
+	CThostFtdcQryProductField& body = pRequest->productField;
+	strncpy(body.ProductID, type.c_str(), sizeof(TThostFtdcInstrumentIDType));
+	AddToSendQueue(pRequest);
+}
+ void CTraderApi::OnRspQryProduct(CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+	 if (m_msgQueue)
+		m_msgQueue->Input_OnRspQryProductInfo(this, pProduct, pRspInfo, nRequestID, bIsLast);
+
+	if (bIsLast)
+		ReleaseRequestMapBuf(nRequestID);
 }

@@ -7,7 +7,7 @@
 #include "MdUserApi.h"
 #include "TraderApi.h"
 #include "CTPMsgQueue.h"
-
+#include <iostream>
 inline CCTPMsgQueue* CTP_GetQueue(void* pMsgQueue)
 {
 	return static_cast<CCTPMsgQueue*>(pMsgQueue);
@@ -246,6 +246,13 @@ QUANTBOXC2CTP_API void __stdcall CTP_RegOnRtnQuote(void* pMsgQueue, fnOnRtnQuote
 }
 
 QUANTBOXC2CTP_API void __stdcall CTP_RegOnRtnTrade(void* pMsgQueue,fnOnRtnTrade pCallback)
+{
+	if(pMsgQueue)
+	{
+		CTP_GetQueue(pMsgQueue)->RegisterCallback(pCallback);
+	}
+}
+QUANTBOXC2CTP_API void __stdcall CTP_RegOnProduct(void* pMsgQueue,fnOnProduct pCallback)
 {
 	if(pMsgQueue)
 	{
@@ -529,6 +536,7 @@ QUANTBOXC2CTP_API void __stdcall TD_ReqQryInvestorPositionDetail(void* pTraderAp
 {
 	if(pTraderApi)
 	{
+		
 		TD_GetApi(pTraderApi)->ReqQryInvestorPositionDetail(NULL==szInstrumentId?"":szInstrumentId);
 	}
 }
@@ -578,5 +586,12 @@ QUANTBOXC2CTP_API void __stdcall TD_ReqQrySettlementInfo(void* pTraderApi, const
 	if (pTraderApi)
 	{
 		TD_GetApi(pTraderApi)->ReqQrySettlementInfo(szTradingDay);
+	}
+}
+QUANTBOXC2CTP_API void __stdcall TD_ReqQryProductInfo(void* pTraderApi, const char* type){
+	if (pTraderApi)
+	{
+		
+		TD_GetApi(pTraderApi)->TD_ReqQryProduct(type);
 	}
 }

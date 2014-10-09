@@ -35,6 +35,7 @@ class CTraderApi :
 		E_QryInstrumentMarginRateField,
 		E_QryDepthMarketDataField,
 		E_QrySettlementInfoField,
+		E_qryProductInfoField,
 	};
 
 	//请求数据包结构体
@@ -57,6 +58,7 @@ class CTraderApi :
 			CThostFtdcInputQuoteField					InputQuoteField;
 			CThostFtdcInputQuoteActionField				InputQuoteActionField;
 			CThostFtdcQrySettlementInfoField			QrySettlementInfoField;
+			CThostFtdcQryProductField					productField;
 		};
 	};
 
@@ -113,7 +115,7 @@ public:
 	void ReqQryInstrumentMarginRate(const string& szInstrumentId,TThostFtdcHedgeFlagType HedgeFlag = THOST_FTDC_HF_Speculation);
 	void ReqQryDepthMarketData(const string& szInstrumentId);
 	void ReqQrySettlementInfo(const string& szTradingDay);
-
+	void TD_ReqQryProduct(const string& type);
 private:
 	//数据包发送线程
 	friend DWORD WINAPI SendThread(LPVOID lpParam);
@@ -197,6 +199,8 @@ private:
 	//其它
 	virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus);
+	///请求查询产品响应
+	virtual void OnRspQryProduct(CThostFtdcProductField *pProduct, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 private:
 	ConnectionStatus			m_status;				//连接状态
